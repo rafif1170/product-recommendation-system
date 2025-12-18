@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">🛍️ Product Recommendation</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/products">Produk</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/recommendations">Rekomendasi</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container my-4">
+    <h2 class="mb-4">⭐ Rekomendasi Produk</h2>
+    <p class="lead">Berdasarkan Algoritma Weighted Score (Rating, Popularitas, Harga)</p>
+
+    <!-- Filter & Weights Form -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">🎛️ Sesuaikan Bobot & Filter</h5>
+      </div>
+      <div class="card-body">
+        <form action="/recommendations" method="GET">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Bobot Rating (0-1)</label>
+              <input type="number" class="form-control" name="ratingWeight" value="<%= weights.rating %>" step="0.1" min="0" max="1">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Bobot Popularitas (0-1)</label>
+              <input type="number" class="form-control" name="popularityWeight" value="<%= weights.popularity %>" step="0.1" min="0" max="1">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Bobot Harga (0-1)</label>
+              <input type="number" class="form-control" name="priceWeight" value="<%= weights.price %>" step="0.1" min="0" max="1">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Filter Kategori</label>
+              <select class="form-control" name="categoryId">
+                <option value="">Semua Kategori</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>" <%= selectedCategory == cat.id ? 'selected' : '' %>>
+                    <%= cat.name %>
+                  </option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">🔄 Hitung Ulang</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-primary"><%= statistics.totalProducts %></h3>
+            <p class="mb-0">Total Produk</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-success">Rp <%= Number(statistics.averagePrice).toLocaleString('id-ID') %></h3>
+            <p class="mb-0">Rata-rata Harga</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-warning"><%= statistics.averageRating %></h3>
+            <p class="mb-0">Rata-rata Rating</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-info"><%= statistics.totalViews %></h3>
+            <p class="mb-0">Total Views</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations List -->
+    <% if (recommendations.length === 0) { %>
+      <div class="alert alert-warning">
+        Tidak ada produk untuk ditampilkan. <a href="/products/create">Tambah produk</a>
+      </div>
+    <% } else { %>
+      <div class="row">
+        <% recommendations.forEach((product, index) => { 
+          const info = product.getInfo();
+        %>
+          <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+              <div class="card-header <%= index < 3 ? 'bg-success text-white' : '' %>">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <% if (index === 0) { %>🥇<% } else if (index === 1) { %>🥈<% } else if (index === 2) { %>🥉<% } else { %>📦<% } %>
+                    <%= info.name %>
+                  </h5>
+                  <span class="badge bg-secondary"><%= info.categoryName %></span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <strong>Harga:</strong> <%= info.price %>
+                  </div>
+                  <div class="col-6">
+                    <strong>Rating:</strong> ⭐ <%= info.rating %>/5
+                  </div>
+                </div>
+                
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <strong>Views:</strong> 👁️ <%= info.viewCount %>
+                  </div>
+                  <div class="col-6">
+                    <strong>Stok:</strong> 
+                    <% if (info.available) { %>
+                      <span class="badge bg-success"><%= info.stock %></span>
+                    <% } else { %>
+                      <span class="badge bg-danger">Habis</span>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <strong>Popularitas:</strong> 
+                  <span class="badge bg-info"><%= info.popularityLevel %></span>
+                </div>
+
+                <hr>
+
+                <div class="mb-2">
+                  <strong>Recommendation Score:</strong>
+                  <div class="progress" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: <%= info.recommendationScore %>" 
+                         aria-valuenow="<%= parseFloat(info.recommendationScore) %>" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                      <%= info.recommendationScore %>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <span class="badge <%= 
+                    info.recommendationLevel === 'Sangat Direkomendasikan' ? 'bg-success' :
+                    info.recommendationLevel === 'Direkomendasikan' ? 'bg-primary' :
+                    info.recommendationLevel === 'Cukup Direkomendasikan' ? 'bg-warning' : 'bg-secondary'
+                  %>">
+                    <%= info.recommendationLevel %>
+                  </span>
+                </div>
+
+                <small class="text-muted">
+                  Normalized: 
+                  Rating: <%= info.normalizedScores.rating %> | 
+                  Popularity: <%= info.normalizedScores.popularity %> | 
+                  Price: <%= info.normalizedScores.price %>
+                </small>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+
+      <div class="alert alert-info mt-4">
+        <h5>📊 Penjelasan Algoritma</h5>
+        <p><strong>Formula:</strong> Score = (w₁ × rating) + (w₂ × popularity) + (w₃ × price)</p>
+        <p class="mb-0">
+          <strong>Bobot Saat Ini:</strong> 
+          Rating = <%= weights.rating %>, 
+          Popularitas = <%= weights.popularity %>, 
+          Harga = <%= weights.price %>
+        </p>
+      </div>
+    <% } %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-light text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2025 Product Recommendation System</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
