@@ -210,12 +210,9 @@ Score = (0.4 × 0.90) + (0.3 × 0.75) + (0.3 × 0.80)
 
 ## 👨‍💻 Author
 
-**Muhammad Rafif**
-- NIM: 2510312020
-**Nyoman Gede Sendy Andriana**
-- NIM: 2510312001
-**Bima Tirta Gilang Utomo**
-- NIM: 2510312002
+**Muhammad Rafif (2510312020)**
+**Nyoman Gede Sendy Andriana (2510312001)**
+**Bima Tirta Gilang Utomo (2510312002)**
 
 - Mata Kuliah: Logika Pemrograman
 - Dosen: Yulizar Widiatama, Bach.Tech.Mgt(Hons), M.Eng
